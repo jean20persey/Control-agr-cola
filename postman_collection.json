@@ -1,0 +1,358 @@
+{
+  "info": {
+    "name": "Control Agrícola API",
+    "description": "Colección completa de endpoints para la API de Control Agrícola",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Cultivos",
+      "item": [
+        {
+          "name": "Listar Cultivos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cultivos/",
+              "host": ["{{base_url}}"],
+              "path": ["cultivos", ""]
+            }
+          }
+        },
+        {
+          "name": "Crear Cultivo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nombre\": \"Maíz Amarillo\",\n    \"variedad\": \"Pioneer 30F35\",\n    \"tipo\": \"cereales\",\n    \"ciclo_dias\": 120,\n    \"rendimiento_esperado\": 8500.0,\n    \"descripcion\": \"Maíz híbrido de alto rendimiento\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/cultivos/",
+              "host": ["{{base_url}}"],
+              "path": ["cultivos", ""]
+            }
+          }
+        },
+        {
+          "name": "Obtener Cultivo por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cultivos/1",
+              "host": ["{{base_url}}"],
+              "path": ["cultivos", "1"]
+            }
+          }
+        },
+        {
+          "name": "Buscar Cultivos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cultivos/buscar?q=maíz&tipo=cereales",
+              "host": ["{{base_url}}"],
+              "path": ["cultivos", "buscar"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "maíz"
+                },
+                {
+                  "key": "tipo",
+                  "value": "cereales"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Parcelas",
+      "item": [
+        {
+          "name": "Listar Parcelas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/parcelas/",
+              "host": ["{{base_url}}"],
+              "path": ["parcelas", ""]
+            }
+          }
+        },
+        {
+          "name": "Crear Parcela",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"codigo\": \"P001\",\n    \"nombre\": \"Parcela Norte\",\n    \"area_hectareas\": 5.5,\n    \"ubicacion_lat\": -12.0464,\n    \"ubicacion_lng\": -77.0428,\n    \"tipo_suelo\": \"Franco arcilloso\",\n    \"ph_suelo\": 6.8,\n    \"cultivo_id\": 1,\n    \"fecha_siembra\": \"2024-03-15\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/parcelas/",
+              "host": ["{{base_url}}"],
+              "path": ["parcelas", ""]
+            }
+          }
+        },
+        {
+          "name": "Buscar Parcela por Código",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/parcelas/codigo/P001",
+              "host": ["{{base_url}}"],
+              "path": ["parcelas", "codigo", "P001"]
+            }
+          }
+        },
+        {
+          "name": "Estadísticas de Parcelas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/parcelas/estadisticas",
+              "host": ["{{base_url}}"],
+              "path": ["parcelas", "estadisticas"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Producción",
+      "item": [
+        {
+          "name": "Listar Registros de Producción",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/produccion/?parcela_id=1&temporada=2024-1",
+              "host": ["{{base_url}}"],
+              "path": ["produccion", ""],
+              "query": [
+                {
+                  "key": "parcela_id",
+                  "value": "1"
+                },
+                {
+                  "key": "temporada",
+                  "value": "2024-1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear Registro de Producción",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"parcela_id\": 1,\n    \"cultivo_id\": 1,\n    \"fecha_registro\": \"2024-07-15\",\n    \"temporada\": \"2024-1\",\n    \"cantidad_kg\": 42500.0,\n    \"calidad\": \"A\",\n    \"temperatura_promedio\": 24.5,\n    \"precipitacion_mm\": 85.2,\n    \"humedad_relativa\": 68.0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/produccion/",
+              "host": ["{{base_url}}"],
+              "path": ["produccion", ""]
+            }
+          }
+        },
+        {
+          "name": "Registros con Anomalías",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/produccion/anomalias",
+              "host": ["{{base_url}}"],
+              "path": ["produccion", "anomalias"]
+            }
+          }
+        },
+        {
+          "name": "Estadísticas por Temporada",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/produccion/estadisticas/temporada/2024-1",
+              "host": ["{{base_url}}"],
+              "path": ["produccion", "estadisticas", "temporada", "2024-1"]
+            }
+          }
+        },
+        {
+          "name": "Serie Temporal de Parcela",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/produccion/series-temporales/1?limite=20",
+              "host": ["{{base_url}}"],
+              "path": ["produccion", "series-temporales", "1"],
+              "query": [
+                {
+                  "key": "limite",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Análisis",
+      "item": [
+        {
+          "name": "Estadísticas Generales",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/analisis/estadisticas-generales",
+              "host": ["{{base_url}}"],
+              "path": ["analisis", "estadisticas-generales"]
+            }
+          }
+        },
+        {
+          "name": "Comparar Variedades",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"cultivo_id_1\": 1,\n    \"cultivo_id_2\": 2,\n    \"temporada\": \"2024-1\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/analisis/comparar-variedades",
+              "host": ["{{base_url}}"],
+              "path": ["analisis", "comparar-variedades"]
+            }
+          }
+        },
+        {
+          "name": "Análisis de Series Temporales",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/analisis/series-temporales/analisis/1",
+              "host": ["{{base_url}}"],
+              "path": ["analisis", "series-temporales", "analisis", "1"]
+            }
+          }
+        },
+        {
+          "name": "Crear Predicción",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"parcela_id\": 1,\n    \"cultivo_id\": 1,\n    \"temporada_objetivo\": \"2024-2\",\n    \"modelo\": \"random_forest\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/analisis/predicciones/crear",
+              "host": ["{{base_url}}"],
+              "path": ["analisis", "predicciones", "crear"]
+            }
+          }
+        },
+        {
+          "name": "Listar Predicciones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/analisis/predicciones?parcela_id=1",
+              "host": ["{{base_url}}"],
+              "path": ["analisis", "predicciones"],
+              "query": [
+                {
+                  "key": "parcela_id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Clasificación por Rendimiento",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/analisis/clasificacion-rendimiento?temporada=2024-1",
+              "host": ["{{base_url}}"],
+              "path": ["analisis", "clasificacion-rendimiento"],
+              "query": [
+                {
+                  "key": "temporada",
+                  "value": "2024-1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
