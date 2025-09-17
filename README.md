@@ -1,14 +1,15 @@
-# 🌾 Control Agrícola API
+# 🌾 Control Agrícola - Sistema de Gestión y Análisis de Producción Agrícola
 
 <div align="center">
 
 ![Control Agrícola Logo](https://img.shields.io/badge/CONTROL%20AGR%C3%8DCOLA-Sistema%20de%20Gesti%C3%B3n%20Agr%C3%ADcola-1a9f0b?style=for-the-badge&logo=agriculture)
 
-**Sistema completo de gestión y análisis de producción agrícola con IA**
+**Sistema completo de gestión agrícola con Django REST Framework y React + TypeScript**
 
 [![Django](https://img.shields.io/badge/Django-5.2-092E20?style=flat&logo=django)](https://djangoproject.com/)
-[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat&logo=typescript)](https://typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18.2-61DAFB?style=flat&logo=react)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.2-3178C6?style=flat&logo=typescript)](https://typescriptlang.org/)
+[![Material-UI](https://img.shields.io/badge/Material--UI-5.14-0081CB?style=flat&logo=mui)](https://mui.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?style=flat&logo=postgresql)](https://postgresql.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -20,47 +21,15 @@
 
 ### 🌱 **Gestión de Cultivos**
 - CRUD completo para diferentes tipos de cultivos y variedades
-- Características agronómicas (temperatura, pH, precipitación)
-- Búsqueda y filtros avanzados
-- Estadísticas por tipo de cultivo
 
-### 🏞️ **Gestión de Parcelas**
-- Control de parcelas con geolocalización
-- Acceso rápido por código (índices hash)
-- Asignación y gestión de cultivos
-- Historial completo por parcela
-- Características del suelo y sistema de riego
+## 🛠️ Tecnologías
 
-### 📊 **Registro de Producción**
-- Seguimiento detallado por parcela y temporada
-- Detección automática de anomalías
-- Condiciones ambientales
-- Series temporales para análisis de tendencias
-
-### 🔬 **Análisis Estadístico Avanzado**
-- Comparación de variedades con pruebas de hipótesis
-- Análisis de series temporales
-- Algoritmos de clasificación por rendimiento
-- Detección de valores atípicos
-
-### 🤖 **Predicciones con IA**
-- Modelos numéricos para proyectar cosechas
-- Machine Learning (Linear Regression, Random Forest, XGBoost)
-- Intervalos de confianza
-- Validación de precisión
-
-### 📈 **Dashboard Inteligente**
-- KPIs agrícolas en tiempo real
-- Gráficos interactivos
-- Alertas y notificaciones
-- Métricas de rendimiento
-
-## 🛠️ Tecnologías Utilizadas
-
-### 🔧 **Backend**
+### Backend
 - **Django 5.2** - Framework web robusto
-- **Django REST Framework** - API REST potente
+- **Django REST Framework 3.14** - API REST completa
 - **PostgreSQL** - Base de datos relacional
+- **JWT** - Autenticación segura
+- **Python 3.8+** - Lenguaje de programación
 - **JWT Authentication** - Autenticación segura
 - **Pandas & NumPy** - Análisis de datos
 - **Scikit-learn** - Machine Learning
