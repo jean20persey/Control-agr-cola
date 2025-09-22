@@ -2,7 +2,7 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Control Agrícola - Sistema de Gestión</title>
     <meta name="description" content="Sistema completo de gestión y análisis de producción agrícola" />
@@ -20,6 +20,70 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Suprimir errores de extensiones de Chrome lo más temprano posible
+      (function() {
+        const originalError = console.error;
+        console.error = function(...args) {
+          const message = args[0];
+          if (typeof message === 'string' && (
+            message.includes('chrome-extension://') ||
+            message.includes('Extension context invalidated') ||
+            message.includes('Could not establish connection') ||
+            message.includes('react-devtools') ||
+            message.includes('ERR_FAILED') ||
+            message.includes('net::ERR_FAILED') ||
+            message.includes('nullish-content') ||
+            message.includes('RETRIES_FAILED') ||
+            message.includes('guillbot-content') ||
+            message.includes('/invalid/') ||
+            message.includes('HEAD') ||
+            message.includes('Failed to load resource')
+          )) {
+            return; // No mostrar estos errores
+          }
+          // También filtrar por URL si el primer argumento no es string
+          if (args.length > 0 && args[0] && args[0].toString) {
+            const fullMessage = args[0].toString();
+            if (fullMessage.includes('chrome-extension://') || 
+                fullMessage.includes('guillbot-content') ||
+                fullMessage.includes('/invalid/')) {
+              return;
+            }
+          }
+          originalError.apply(console, args);
+        };
+
+        const originalWarn = console.warn;
+        console.warn = function(...args) {
+          const message = args[0];
+          if (typeof message === 'string' && (
+            message.includes('chrome-extension://') ||
+            message.includes('React Router Future Flag Warning') ||
+            message.includes('Relative route resolution within Splat routes')
+          )) {
+            return; // No mostrar estos warnings
+          }
+          originalWarn.apply(console, args);
+        };
+
+        // Suprimir errores de red de extensiones
+        window.addEventListener('error', function(event) {
+          if (event.filename && event.filename.includes('chrome-extension://')) {
+            event.preventDefault();
+            return false;
+          }
+        });
+
+        window.addEventListener('unhandledrejection', function(event) {
+          if (event.reason && event.reason.message && 
+              event.reason.message.includes('chrome-extension://')) {
+            event.preventDefault();
+            return false;
+          }
+        });
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, AuthTokens, LoginCredentials, RegisterData } from '../interfaces';
+import { User, LoginCredentials, RegisterData } from '../interfaces';
 import apiService from '../services/api';
 
 interface AuthContextType {
@@ -32,12 +32,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const savedUser = localStorage.getItem('user');
 
         if (token && savedUser) {
-          // Verificar que el token siga siendo válido
-          const userData = await apiService.getUserProfile();
-          setUser(userData);
+          try {
+            // Intentar parsear el usuario guardado primero
+            const parsedUser = JSON.parse(savedUser);
+            setUser(parsedUser);
+            
+            // Verificar que el token siga siendo válido en segundo plano
+            const userData = await apiService.getUserProfile();
+            setUser(userData);
+          } catch (profileError: any) {
+            // Si el token no es válido, usar el usuario guardado temporalmente
+            // y limpiar solo si es un error de autenticación
+            if (profileError.response?.status === 401 || profileError.response?.status === 403) {
+              localStorage.removeItem('access_token');
+              localStorage.removeItem('refresh_token');
+              localStorage.removeItem('user');
+              setUser(null);
+            } else {
+              // Para otros errores (404, 500, etc.), mantener el usuario guardado
+              try {
+                const parsedUser = JSON.parse(savedUser);
+                setUser(parsedUser);
+              } catch {
+                // Si no se puede parsear, limpiar todo
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                localStorage.removeItem('user');
+                setUser(null);
+              }
+            }
+          }
         }
       } catch (error) {
-        // Si hay error, limpiar datos de autenticación
+        // Error general, limpiar datos de autenticación
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('user');

@@ -216,17 +216,60 @@ const Dashboard: React.FC = () => {
 
   return (
     <Box>
-      {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 600 }}>
-          Dashboard
-        </Typography>
-        <Tooltip title="Actualizar datos">
-          <IconButton onClick={loadDashboardData} color="primary">
-            <Refresh />
-          </IconButton>
-        </Tooltip>
-      </Box>
+      {/* Hero Section with Agricultural Image */}
+      <Card sx={{ mb: 4, position: 'relative', overflow: 'hidden' }}>
+        <Box
+          sx={{
+            position: 'relative',
+            height: 200,
+            background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            px: 4,
+            color: 'white',
+          }}
+        >
+          <Box sx={{ flex: 1, zIndex: 2 }}>
+            <Typography variant="h3" component="h1" sx={{ fontWeight: 700, mb: 1 }}>
+              Sistema de Control Agrícola
+            </Typography>
+            <Typography variant="h6" sx={{ opacity: 0.9, mb: 2 }}>
+              Monitoreo inteligente y análisis de cultivos
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                Dashboard
+              </Typography>
+              <Tooltip title="Actualizar datos">
+                <IconButton onClick={loadDashboardData} sx={{ color: 'white' }}>
+                  <Refresh />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
+          <Box
+            sx={{
+              position: 'absolute',
+              right: 20,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              opacity: 0.3,
+              zIndex: 1,
+            }}
+          >
+            <img
+              src="/agriculture-hero.svg"
+              alt="Sistema Agrícola"
+              style={{
+                width: 300,
+                height: 150,
+                objectFit: 'contain',
+              }}
+            />
+          </Box>
+        </Box>
+      </Card>
 
       {/* KPIs principales */}
       <Grid container spacing={3} sx={{ mb: 4 }}>

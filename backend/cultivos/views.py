@@ -56,14 +56,13 @@ class CultivoDetailView(generics.RetrieveUpdateDestroyAPIView):
 @permission_classes([IsAuthenticated])
 def cultivos_tipos_view(request):
     """Obtener tipos de cultivos disponibles"""
-    tipos = Cultivo.objects.filter(activo=True).values_list('tipo', flat=True).distinct()
+    # Devolver todos los tipos definidos en el modelo, no solo los que existen en la BD
     tipos_con_nombres = []
     
-    for tipo in tipos:
-        nombre_tipo = dict(Cultivo.TIPOS_CULTIVO).get(tipo, tipo)
+    for value, label in Cultivo.TIPOS_CULTIVO:
         tipos_con_nombres.append({
-            'value': tipo,
-            'label': nombre_tipo
+            'value': value,
+            'label': label
         })
     
     return Response(tipos_con_nombres)

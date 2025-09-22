@@ -85,7 +85,9 @@ const ParcelaModal: React.FC<ParcelaModalProps> = ({
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
+    console.log('ParcelaModal - Estado open:', open);
     if (open) {
+      console.log('Cargando cultivos para el modal...');
       loadCultivos();
     }
   }, [open]);

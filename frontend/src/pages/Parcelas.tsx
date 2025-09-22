@@ -54,6 +54,7 @@ const Parcelas: React.FC = () => {
   }, []);
 
   const handleOpenModal = (parcela?: Parcela) => {
+    console.log('Abriendo modal de parcela:', parcela ? 'Editar' : 'Nuevo');
     setSelectedParcela(parcela || null);
     setModalOpen(true);
   };
@@ -304,7 +305,10 @@ const Parcelas: React.FC = () => {
           <Button
             variant="contained"
             startIcon={<Add />}
-            onClick={() => handleOpenModal()}
+            onClick={() => {
+              console.log('Click en botón Nueva Parcela');
+              handleOpenModal();
+            }}
           >
             Nueva Parcela
           </Button>

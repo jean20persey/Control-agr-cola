@@ -14,6 +14,7 @@ import {
   Badge,
   Tooltip,
 } from '@mui/material';
+import NotificationPanel from '../Notifications/NotificationPanel';
 import {
   Menu as MenuIcon,
   AccountCircle,
@@ -23,6 +24,7 @@ import {
   Agriculture,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { useNotifications } from '../../contexts/NotificationContext';
 
 interface HeaderProps {
   drawerWidth: number;
@@ -37,7 +39,9 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { unreadCount } = useNotifications();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [notificationAnchorEl, setNotificationAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -50,6 +54,19 @@ const Header: React.FC<HeaderProps> = ({
   const handleProfileClick = () => {
     handleProfileMenuClose();
     navigate('/profile');
+  };
+
+  const handleSettingsClick = () => {
+    handleProfileMenuClose();
+    navigate('/settings');
+  };
+
+  const handleNotificationClick = (event: React.MouseEvent<HTMLElement>) => {
+    setNotificationAnchorEl(event.currentTarget);
+  };
+
+  const handleNotificationClose = () => {
+    setNotificationAnchorEl(null);
   };
 
   const handleLogout = () => {
@@ -96,8 +113,8 @@ const Header: React.FC<HeaderProps> = ({
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {/* Notificaciones */}
             <Tooltip title="Notificaciones">
-              <IconButton color="inherit">
-                <Badge badgeContent={3} color="error">
+              <IconButton color="inherit" onClick={handleNotificationClick}>
+                <Badge badgeContent={unreadCount} color="error">
                   <Notifications />
                 </Badge>
               </IconButton>
@@ -184,7 +201,7 @@ const Header: React.FC<HeaderProps> = ({
           Mi Perfil
         </MenuItem>
 
-        <MenuItem onClick={handleProfileMenuClose}>
+        <MenuItem onClick={handleSettingsClick}>
           <ListItemIcon>
             <Settings fontSize="small" />
           </ListItemIcon>
@@ -200,6 +217,13 @@ const Header: React.FC<HeaderProps> = ({
           Cerrar Sesión
         </MenuItem>
       </Menu>
+
+      {/* Panel de Notificaciones */}
+      <NotificationPanel
+        anchorEl={notificationAnchorEl}
+        open={Boolean(notificationAnchorEl)}
+        onClose={handleNotificationClose}
+      />
     </>
   );
 };

@@ -4,17 +4,9 @@ import {
   Box,
   CssBaseline,
   Drawer,
-  AppBar,
-  Toolbar,
-  Typography,
-  IconButton,
   useTheme,
   useMediaQuery,
 } from '@mui/material';
-import {
-  Menu as MenuIcon,
-  ChevronLeft as ChevronLeftIcon,
-} from '@mui/icons-material';
 
 import Sidebar from './Sidebar';
 import Header from './Header';

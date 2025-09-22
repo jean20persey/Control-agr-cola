@@ -15,6 +15,11 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
 } from '@mui/material';
 import {
   Analytics,
@@ -22,9 +27,10 @@ import {
   Timeline,
   BarChart,
   CompareArrows,
-  TrendingUp,
   Assessment,
   Functions,
+  Close,
+  Info,
 } from '@mui/icons-material';
 import apiService from '../services/api';
 
@@ -59,6 +65,8 @@ const Analisis: React.FC = () => {
   const [estadisticasGenerales, setEstadisticasGenerales] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedAnalysis, setSelectedAnalysis] = useState<any>(null);
 
   const loadData = async () => {
     try {
@@ -80,6 +88,17 @@ const Analisis: React.FC = () => {
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
+  };
+
+  const handleOpenAnalysis = (analysisOption: any) => {
+    console.log('Abriendo análisis:', analysisOption.title);
+    setSelectedAnalysis(analysisOption);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedAnalysis(null);
   };
 
   const analisisOptions = [
@@ -250,7 +269,7 @@ const Analisis: React.FC = () => {
                     <Button
                       fullWidth
                       variant="contained"
-                      onClick={() => {/* TODO: Abrir modal específico */}}
+                      onClick={() => handleOpenAnalysis(option)}
                     >
                       {option.action}
                     </Button>
@@ -278,34 +297,96 @@ const Analisis: React.FC = () => {
         </TabPanel>
       </Card>
 
-      {/* Top cultivos por rendimiento */}
-      {estadisticasGenerales && estadisticasGenerales.top_cultivos_rendimiento.length > 0 && (
-        <Card sx={{ mt: 3 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-              <TrendingUp sx={{ mr: 1 }} />
-              Top Cultivos por Rendimiento
+      {/* Modal de Análisis */}
+      <Dialog open={modalOpen} onClose={handleCloseModal} maxWidth="md" fullWidth>
+        <DialogTitle>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              {selectedAnalysis?.icon}
+              {selectedAnalysis?.title}
+            </Box>
+            <IconButton onClick={handleCloseModal}>
+              <Close />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        
+        <DialogContent>
+          <Alert severity="info" sx={{ mb: 3 }}>
+            <Typography variant="body2">
+              <strong>🚧 Funcionalidad en Desarrollo</strong><br/>
+              Esta herramienta de análisis estadístico está siendo desarrollada y estará disponible próximamente.
             </Typography>
-            <List>
-              {estadisticasGenerales.top_cultivos_rendimiento.slice(0, 5).map((cultivo: any, index: number) => (
-                <ListItem key={index}>
-                  <ListItemIcon>
+          </Alert>
+
+          {selectedAnalysis && (
+            <Box>
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                {selectedAnalysis.description}
+              </Typography>
+
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                📊 Características Incluidas:
+              </Typography>
+              
+              <Grid container spacing={1} sx={{ mb: 3 }}>
+                {selectedAnalysis.features?.map((feature: string, idx: number) => (
+                  <Grid item key={idx}>
                     <Chip
-                      label={`#${index + 1}`}
+                      label={feature}
                       size="small"
-                      color={index === 0 ? 'success' : index === 1 ? 'info' : 'default'}
+                      color="primary"
+                      variant="outlined"
                     />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={cultivo.cultivo__nombre}
-                    secondary={`${cultivo.rendimiento_promedio.toFixed(1)} kg/ha promedio`}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </CardContent>
-        </Card>
-      )}
+                  </Grid>
+                ))}
+              </Grid>
+
+              <Alert severity="warning">
+                <Typography variant="body2">
+                  <strong>📋 Requisitos para usar esta herramienta:</strong><br/>
+                  • Al menos 10 registros de producción históricos<br/>
+                  • Múltiples parcelas con diferentes cultivos<br/>
+                  • Datos de al menos 2 temporadas completas<br/>
+                  • Información completa de rendimientos y condiciones ambientales
+                </Typography>
+              </Alert>
+
+              <Box sx={{ mt: 3, p: 2, bgcolor: 'background.paper', borderRadius: 1, border: 1, borderColor: 'divider' }}>
+                <Typography variant="subtitle2" gutterBottom>
+                  💡 Mientras tanto, puedes:
+                </Typography>
+                <List dense>
+                  <ListItem>
+                    <ListItemIcon>
+                      <Info color="primary" />
+                    </ListItemIcon>
+                    <ListItemText primary="Crear más registros de producción" />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemIcon>
+                      <Info color="primary" />
+                    </ListItemIcon>
+                    <ListItemText primary="Registrar datos de múltiples parcelas" />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemIcon>
+                      <Info color="primary" />
+                    </ListItemIcon>
+                    <ListItemText primary="Documentar condiciones ambientales" />
+                  </ListItem>
+                </List>
+              </Box>
+            </Box>
+          )}
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={handleCloseModal} color="primary">
+            Entendido
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

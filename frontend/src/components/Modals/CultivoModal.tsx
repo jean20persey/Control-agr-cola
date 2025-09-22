@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -24,15 +24,7 @@ interface CultivoModalProps {
   cultivo?: Cultivo | null;
 }
 
-const tiposCultivo = [
-  { value: 'cereal', label: 'Cereal' },
-  { value: 'legumbre', label: 'Legumbre' },
-  { value: 'hortaliza', label: 'Hortaliza' },
-  { value: 'fruta', label: 'Fruta' },
-  { value: 'tuberculo', label: 'Tubérculo' },
-  { value: 'oleaginosa', label: 'Oleaginosa' },
-  { value: 'forraje', label: 'Forraje' },
-];
+// Los tipos se cargarán dinámicamente desde el backend
 
 const CultivoModal: React.FC<CultivoModalProps> = ({
   open,
@@ -57,6 +49,51 @@ const CultivoModal: React.FC<CultivoModalProps> = ({
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
+  const [tiposCultivo, setTiposCultivo] = useState<Array<{value: string, label: string}>>([]);
+
+  // Cargar tipos de cultivo desde el backend
+  useEffect(() => {
+    const loadTiposCultivo = async () => {
+      console.log('Iniciando carga de tipos de cultivo...');
+      
+      // Usar tipos por defecto inmediatamente para que el dropdown funcione
+      const tiposDefault = [
+        { value: 'cereales', label: 'Cereales' },
+        { value: 'hortalizas', label: 'Hortalizas' },
+        { value: 'frutales', label: 'Frutales' },
+        { value: 'legumbres', label: 'Legumbres' },
+        { value: 'tubérculos', label: 'Tubérculos' },
+        { value: 'oleaginosas', label: 'Oleaginosas' },
+        { value: 'forrajes', label: 'Forrajes' },
+        { value: 'otros', label: 'Otros' },
+      ];
+      
+      setTiposCultivo(tiposDefault);
+      
+      try {
+        const tipos = await apiService.getCultivosTipos();
+        console.log('Tipos de cultivo desde backend:', JSON.stringify(tipos, null, 2));
+        
+        // Si el backend devuelve tipos, usarlos; sino mantener los default
+        if (Array.isArray(tipos) && tipos.length > 0) {
+          const tiposFormateados = tipos.map((tipo: any) => ({
+            value: tipo.value || tipo.key || tipo,
+            label: tipo.label || tipo.display_name || tipo
+          }));
+          console.log('Tipos formateados:', tiposFormateados);
+          setTiposCultivo(tiposFormateados);
+        }
+      } catch (error) {
+        console.error('Error al cargar tipos de cultivo desde backend:', error);
+        console.log('Usando tipos por defecto');
+        // Los tipos default ya están establecidos, no hacer nada más
+      }
+    };
+
+    if (open) {
+      loadTiposCultivo();
+    }
+  }, [open]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -89,13 +126,22 @@ const CultivoModal: React.FC<CultivoModalProps> = ({
       }
 
       const cultivoData = {
-        ...formData,
-        temperatura_optima_min: formData.temperatura_optima_min || null,
-        temperatura_optima_max: formData.temperatura_optima_max || null,
-        ph_suelo_min: formData.ph_suelo_min || null,
-        ph_suelo_max: formData.ph_suelo_max || null,
-        precipitacion_anual: formData.precipitacion_anual || null,
+        nombre: formData.nombre.trim(),
+        variedad: formData.variedad.trim(),
+        tipo: formData.tipo,
+        ciclo_dias: Number(formData.ciclo_dias),
+        rendimiento_esperado: Number(formData.rendimiento_esperado),
+        descripcion: formData.descripcion.trim(),
+        temperatura_optima_min: formData.temperatura_optima_min ? Number(formData.temperatura_optima_min) : null,
+        temperatura_optima_max: formData.temperatura_optima_max ? Number(formData.temperatura_optima_max) : null,
+        ph_suelo_min: formData.ph_suelo_min ? Number(formData.ph_suelo_min) : null,
+        ph_suelo_max: formData.ph_suelo_max ? Number(formData.ph_suelo_max) : null,
+        precipitacion_anual: formData.precipitacion_anual ? Number(formData.precipitacion_anual) : null,
+        activo: formData.activo,
       };
+
+      // Debug: mostrar datos que se envían
+      console.log('Datos del cultivo a enviar:', JSON.stringify(cultivoData, null, 2));
 
       let savedCultivo;
       if (cultivo?.id) {
@@ -109,7 +155,34 @@ const CultivoModal: React.FC<CultivoModalProps> = ({
       onSave(savedCultivo);
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.error || err.message || 'Error al guardar cultivo');
+      console.error('Error al crear cultivo:', err);
+      console.error('Respuesta del servidor:', JSON.stringify(err.response?.data, null, 2));
+      console.error('Status:', err.response?.status);
+      console.error('Headers:', err.response?.headers);
+      
+      let errorMessage = 'Error al guardar cultivo';
+      if (err.response?.data) {
+        if (typeof err.response.data === 'string') {
+          errorMessage = err.response.data;
+        } else if (err.response.data.error) {
+          errorMessage = err.response.data.error;
+        } else if (err.response.data.detail) {
+          errorMessage = err.response.data.detail;
+        } else {
+          // Mostrar errores de validación específicos
+          const errors = Object.entries(err.response.data).map(([field, messages]) => {
+            if (Array.isArray(messages)) {
+              return `${field}: ${messages.join(', ')}`;
+            }
+            return `${field}: ${messages}`;
+          }).join('\n');
+          errorMessage = errors || errorMessage;
+        }
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

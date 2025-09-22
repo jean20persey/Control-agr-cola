@@ -1,0 +1,39 @@
+/* Suprimir elementos de error de extensiones de Chrome */
+div[data-testid*="chrome-extension"],
+div[class*="chrome-extension"],
+div[id*="chrome-extension"],
+iframe[src*="chrome-extension://"],
+script[src*="chrome-extension://"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Ocultar mensajes de error específicos */
+.error-message:has-text("chrome-extension"),
+.error-message:has-text("Extension context invalidated"),
+.error-message:has-text("Could not establish connection") {
+  display: none !important;
+}
+
+/* Ocultar warnings de React DevTools */
+div:has-text("Download the React DevTools"),
+div:has-text("React DevTools") {
+  display: none !important;
+}
+
+/* Mejorar la apariencia de la consola del desarrollador */
+.console-error-level:has-text("chrome-extension") {
+  display: none !important;
+}
+
+/* Estilos para mejorar la experiencia de desarrollo */
+.dev-clean-console {
+  filter: none !important;
+}
+
+/* Ocultar elementos relacionados con extensiones */
+[data-extension-id],
+[data-chrome-extension] {
+  display: none !important;
+}

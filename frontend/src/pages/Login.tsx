@@ -18,7 +18,6 @@ import {
   Lock,
   Visibility,
   VisibilityOff,
-  Agriculture,
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { LoginCredentials } from '../interfaces';
@@ -94,13 +93,16 @@ const Login: React.FC = () => {
         <CardContent sx={{ p: 4 }}>
           {/* Header */}
           <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <Agriculture
-              sx={{
-                fontSize: 48,
-                color: 'primary.main',
-                mb: 2,
-              }}
-            />
+            <Box sx={{ mb: 2 }}>
+              <img
+                src="/agriculture-icon.svg"
+                alt="Control Agrícola"
+                style={{
+                  width: 64,
+                  height: 64,
+                }}
+              />
+            </Box>
             <Typography variant="h4" component="h1" gutterBottom>
               Control Agrícola
             </Typography>

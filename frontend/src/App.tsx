@@ -12,6 +12,7 @@ import Parcelas from './pages/Parcelas';
 import Produccion from './pages/Produccion';
 import Analisis from './pages/Analisis';
 import Profile from './pages/Profile';
+import Settings from './pages/Settings';
 
 // Componentes de layout
 import Layout from './components/Layout/Layout';
@@ -64,6 +65,7 @@ const App: React.FC = () => {
         <Route path="produccion" element={<Produccion />} />
         <Route path="analisis" element={<Analisis />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="settings" element={<Settings />} />
       </Route>
 
       {/* Ruta por defecto - redirigir al login si no está autenticado */}

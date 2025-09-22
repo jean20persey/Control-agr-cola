@@ -20,6 +20,8 @@ import {
   Agriculture,
   ThermostatAuto,
   WaterDrop,
+  TrendingUp,
+  Category,
 } from '@mui/icons-material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Cultivo } from '../interfaces';
@@ -259,6 +261,12 @@ const Cultivos: React.FC = () => {
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
+              <Chip 
+                icon={<Agriculture />} 
+                label="Activos" 
+                color="success" 
+                sx={{ mb: 1 }} 
+              />
               <Typography variant="h4" sx={{ fontWeight: 600, color: 'success.main' }}>
                 {Array.isArray(cultivos) ? cultivos.filter(c => c.activo).length : 0}
               </Typography>
@@ -271,6 +279,7 @@ const Cultivos: React.FC = () => {
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
+              <Category sx={{ fontSize: 40, color: 'info.main', mb: 1 }} />
               <Typography variant="h4" sx={{ fontWeight: 600, color: 'info.main' }}>
                 {Array.isArray(cultivos) ? new Set(cultivos.map(c => c.tipo)).size : 0}
               </Typography>
@@ -283,11 +292,12 @@ const Cultivos: React.FC = () => {
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
+              <TrendingUp sx={{ fontSize: 40, color: 'warning.main', mb: 1 }} />
               <Typography variant="h4" sx={{ fontWeight: 600, color: 'warning.main' }}>
-                {Array.isArray(cultivos) && cultivos.length > 0 ? Math.round(cultivos.reduce((acc, c) => acc + c.rendimiento_esperado, 0) / cultivos.length) : 0}
+                {Array.isArray(cultivos) && cultivos.length > 0 ? Math.round(cultivos.reduce((acc, c) => acc + c.rendimiento_esperado, 0) / cultivos.length).toLocaleString() : 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Rendimiento Promedio
+                Rendimiento Promedio (kg/ha)
               </Typography>
             </CardContent>
           </Card>

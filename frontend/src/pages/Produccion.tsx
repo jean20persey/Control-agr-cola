@@ -25,6 +25,8 @@ import {
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { RegistroProduccion, PrediccionCosecha } from '../interfaces';
 import apiService from '../services/api';
+import RegistroProduccionModal from '../components/Modals/RegistroProduccionModal';
+import PrediccionModal from '../components/Modals/PrediccionModal';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -41,15 +43,35 @@ function TabPanel(props: TabPanelProps) {
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
+      style={{ 
+        flex: 1, 
+        display: value === index ? 'flex' : 'none', 
+        flexDirection: 'column',
+        minHeight: 0
+      }}
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ 
+          p: 1, 
+          flex: 1, 
+          display: 'flex', 
+          flexDirection: 'column',
+          minHeight: 0,
+          overflow: 'hidden'
+        }}>
           {children}
         </Box>
       )}
     </div>
   );
+}
+
+function a11yProps(index: number) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
 }
 
 const Produccion: React.FC = () => {
@@ -59,6 +81,8 @@ const Produccion: React.FC = () => {
   const [anomalias, setAnomalias] = useState<RegistroProduccion[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [prediccionModalOpen, setPrediccionModalOpen] = useState(false);
 
   const loadData = async () => {
     try {
@@ -75,6 +99,8 @@ const Produccion: React.FC = () => {
       const registrosData = Array.isArray(registrosResponse) ? registrosResponse : registrosResponse.results || [];
       const prediccionesData = Array.isArray(prediccionesResponse) ? prediccionesResponse : prediccionesResponse.results || [];
       const anomaliasData = Array.isArray(anomaliasResponse) ? anomaliasResponse : anomaliasResponse.results || [];
+
+      console.log('Registros de producción cargados:', JSON.stringify(registrosData, null, 2));
 
       setRegistros(registrosData);
       setPredicciones(prediccionesData);
@@ -94,6 +120,35 @@ const Produccion: React.FC = () => {
     setTabValue(newValue);
   };
 
+  const handleOpenModal = () => {
+    console.log('Abriendo modal de nuevo registro de producción');
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
+
+  const handleSaveRegistro = (savedRegistro: RegistroProduccion) => {
+    setRegistros(prev => [...prev, savedRegistro]);
+    loadData(); // Recargar todos los datos para actualizar estadísticas
+  };
+
+  const handleOpenPrediccionModal = () => {
+    console.log('Abriendo modal de nueva predicción');
+    setPrediccionModalOpen(true);
+  };
+
+  const handleClosePrediccionModal = () => {
+    setPrediccionModalOpen(false);
+  };
+
+  const handleSavePrediccion = (savedPrediccion: PrediccionCosecha) => {
+    setPredicciones(prev => [...prev, savedPrediccion]);
+    loadData(); // Recargar todos los datos para actualizar estadísticas
+  };
+
+
   const getCalidadColor = (calidad: string) => {
     switch (calidad) {
       case 'A':
@@ -111,29 +166,32 @@ const Produccion: React.FC = () => {
 
   const registrosColumns: GridColDef[] = [
     {
-      field: 'parcela_info',
+      field: 'parcela_codigo',
       headerName: 'Parcela',
-      width: 120,
+      flex: 1,
+      minWidth: 120,
       renderCell: (params) => (
         <Typography variant="body2" fontWeight={500}>
-          {params.value?.codigo}
+          {params.value || params.row.parcela_info?.codigo || `Parcela ${params.row.parcela}`}
         </Typography>
       ),
     },
     {
-      field: 'cultivo_info',
+      field: 'cultivo_nombre',
       headerName: 'Cultivo',
-      width: 150,
+      flex: 0.8,
+      minWidth: 100,
       renderCell: (params) => (
         <Typography variant="body2">
-          {params.value?.nombre}
+          {params.value || params.row.cultivo_info?.nombre || `Cultivo ${params.row.cultivo}`}
         </Typography>
       ),
     },
     {
       field: 'fecha_registro',
       headerName: 'Fecha',
-      width: 120,
+      flex: 0.7,
+      minWidth: 90,
       renderCell: (params) => (
         <Typography variant="body2">
           {new Date(params.value).toLocaleDateString()}
@@ -143,12 +201,14 @@ const Produccion: React.FC = () => {
     {
       field: 'temporada',
       headerName: 'Temporada',
-      width: 100,
+      flex: 0.5,
+      minWidth: 70,
     },
     {
       field: 'cantidad_kg',
-      headerName: 'Cantidad (kg)',
-      width: 120,
+      headerName: 'Cantidad',
+      flex: 0.8,
+      minWidth: 90,
       type: 'number',
       renderCell: (params) => (
         <Typography variant="body2">
@@ -159,10 +219,11 @@ const Produccion: React.FC = () => {
     {
       field: 'rendimiento_hectarea',
       headerName: 'Rendimiento',
-      width: 120,
+      flex: 1,
+      minWidth: 110,
       type: 'number',
       renderCell: (params) => (
-        <Typography variant="body2">
+        <Typography variant="body2" fontWeight={500}>
           {params.value?.toFixed(1)} kg/ha
         </Typography>
       ),
@@ -316,10 +377,22 @@ const Produccion: React.FC = () => {
   }
 
   return (
-    <Box>
+    <Box sx={{ 
+      height: 'calc(100vh - 80px)', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      overflow: 'hidden',
+      p: 2
+    }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 600 }}>
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        mb: 2,
+        flexShrink: 0
+      }}>
+        <Typography variant="h4" sx={{ fontWeight: 600 }}>
           Gestión de Producción
         </Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
@@ -331,7 +404,7 @@ const Produccion: React.FC = () => {
           <Button
             variant="contained"
             startIcon={<Add />}
-            onClick={() => {/* TODO: Abrir modal de crear registro */}}
+            onClick={handleOpenModal}
           >
             Nuevo Registro
           </Button>
@@ -340,60 +413,60 @@ const Produccion: React.FC = () => {
 
       {/* Error Alert */}
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert severity="error" sx={{ mb: 2, flexShrink: 0 }}>
           {error}
         </Alert>
       )}
 
-      {/* Estadísticas rápidas */}
-      <Grid container spacing={3} sx={{ mb: 3 }}>
+      {/* Tarjetas de estadísticas */}
+      <Grid container spacing={2} sx={{ mb: 2, flexShrink: 0 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Assessment sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
-              <Typography variant="h4" sx={{ fontWeight: 600 }}>
+          <Card sx={{ height: '100px' }}>
+            <CardContent sx={{ textAlign: 'center', p: 1.5, '&:last-child': { pb: 1.5 } }}>
+              <Assessment sx={{ fontSize: 32, color: 'primary.main', mb: 0.5 }} />
+              <Typography variant="h5" sx={{ fontWeight: 600, mb: 0.5 }}>
                 {Array.isArray(registros) ? registros.length : 0}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="caption" color="text.secondary">
                 Total Registros
               </Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Warning sx={{ fontSize: 40, color: 'error.main', mb: 1 }} />
-              <Typography variant="h4" sx={{ fontWeight: 600, color: 'error.main' }}>
+          <Card sx={{ height: '100px' }}>
+            <CardContent sx={{ textAlign: 'center', p: 1.5, '&:last-child': { pb: 1.5 } }}>
+              <Warning sx={{ fontSize: 32, color: 'error.main', mb: 0.5 }} />
+              <Typography variant="h5" sx={{ fontWeight: 600, color: 'error.main', mb: 0.5 }}>
                 {Array.isArray(anomalias) ? anomalias.length : 0}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="caption" color="text.secondary">
                 Anomalías Detectadas
               </Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Science sx={{ fontSize: 40, color: 'info.main', mb: 1 }} />
-              <Typography variant="h4" sx={{ fontWeight: 600, color: 'info.main' }}>
+          <Card sx={{ height: '100px' }}>
+            <CardContent sx={{ textAlign: 'center', p: 1.5, '&:last-child': { pb: 1.5 } }}>
+              <Science sx={{ fontSize: 32, color: 'info.main', mb: 0.5 }} />
+              <Typography variant="h5" sx={{ fontWeight: 600, color: 'info.main', mb: 0.5 }}>
                 {Array.isArray(predicciones) ? predicciones.length : 0}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="caption" color="text.secondary">
                 Predicciones Activas
               </Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <TrendingUp sx={{ fontSize: 40, color: 'success.main', mb: 1 }} />
-              <Typography variant="h4" sx={{ fontWeight: 600, color: 'success.main' }}>
+          <Card sx={{ height: '100px' }}>
+            <CardContent sx={{ textAlign: 'center', p: 1.5, '&:last-child': { pb: 1.5 } }}>
+              <TrendingUp sx={{ fontSize: 32, color: 'success.main', mb: 0.5 }} />
+              <Typography variant="h5" sx={{ fontWeight: 600, color: 'success.main', mb: 0.5 }}>
                 {Array.isArray(registros) && registros.length > 0 ? (registros.reduce((acc, r) => acc + r.eficiencia_rendimiento, 0) / registros.length).toFixed(1) : 0}%
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="caption" color="text.secondary">
                 Eficiencia Promedio
               </Typography>
             </CardContent>
@@ -401,23 +474,26 @@ const Produccion: React.FC = () => {
         </Grid>
       </Grid>
 
-      {/* Tabs */}
-      <Card>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+      {/* Tabs de contenido */}
+      <Card sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', flexShrink: 0 }}>
           <Tabs value={tabValue} onChange={handleTabChange} aria-label="tabs de producción">
-            <Tab 
-              label={`Registros (${Array.isArray(registros) ? registros.length : 0})`} 
-              icon={<Assessment />} 
+            <Tab
+              icon={<Assessment />}
+              label="REGISTROS"
+              {...a11yProps(0)}
               iconPosition="start"
             />
-            <Tab 
-              label={`Predicciones (${Array.isArray(predicciones) ? predicciones.length : 0})`} 
-              icon={<Science />} 
+            <Tab
+              icon={<Science />}
+              label="PREDICCIONES"
+              {...a11yProps(1)}
               iconPosition="start"
             />
-            <Tab 
-              label={`Anomalías (${Array.isArray(anomalias) ? anomalias.length : 0})`} 
-              icon={<Warning />} 
+            <Tab
+              icon={<Warning />}
+              label="ANOMALÍAS"
+              {...a11yProps(2)}
               iconPosition="start"
             />
           </Tabs>
@@ -436,17 +512,50 @@ const Produccion: React.FC = () => {
             pageSizeOptions={[5, 10, 25]}
             checkboxSelection
             disableRowSelectionOnClick
-            autoHeight
+            disableColumnMenu
+            sx={{
+              flex: 1,
+              width: '100%',
+              minHeight: 0,
+              '& .MuiDataGrid-root': {
+                overflowX: 'hidden',
+                height: '100%',
+              },
+              '& .MuiDataGrid-main': {
+                height: '100%',
+              },
+              '& .MuiDataGrid-virtualScroller': {
+                overflowX: 'hidden',
+              },
+              '& .MuiDataGrid-cell': {
+                borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              },
+              '& .MuiDataGrid-columnHeaders': {
+                backgroundColor: '#f8f9fa',
+                borderBottom: '2px solid rgba(0, 0, 0, 0.1)',
+                fontWeight: 600,
+              },
+              '& .MuiDataGrid-row:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.04)',
+              },
+              '& .MuiDataGrid-footerContainer': {
+                borderTop: '1px solid rgba(0, 0, 0, 0.12)',
+              },
+            }}
           />
         </TabPanel>
 
         {/* Tab Panel - Predicciones */}
         <TabPanel value={tabValue} index={1}>
-          <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
+          <Box sx={{ mb: 1, display: 'flex', justifyContent: 'flex-end', flexShrink: 0 }}>
             <Button
               variant="outlined"
               startIcon={<Science />}
-              onClick={() => {/* TODO: Abrir modal de crear predicción */}}
+              onClick={handleOpenPrediccionModal}
+              size="small"
             >
               Nueva Predicción
             </Button>
@@ -462,7 +571,16 @@ const Produccion: React.FC = () => {
             pageSizeOptions={[5, 10, 25]}
             checkboxSelection
             disableRowSelectionOnClick
-            autoHeight
+            sx={{
+              flex: 1,
+              minHeight: 0,
+              '& .MuiDataGrid-root': {
+                height: '100%',
+              },
+              '& .MuiDataGrid-main': {
+                height: '100%',
+              },
+            }}
           />
         </TabPanel>
 
@@ -479,10 +597,26 @@ const Produccion: React.FC = () => {
               }}
               pageSizeOptions={[5, 10, 25]}
               disableRowSelectionOnClick
-              autoHeight
+              sx={{
+                flex: 1,
+                minHeight: 0,
+                '& .MuiDataGrid-root': {
+                  height: '100%',
+                },
+                '& .MuiDataGrid-main': {
+                  height: '100%',
+                },
+              }}
             />
           ) : (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
+            <Box sx={{ 
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              textAlign: 'center'
+            }}>
               <Assessment sx={{ fontSize: 48, color: 'success.main', mb: 2 }} />
               <Typography variant="h6" color="text.secondary">
                 No hay anomalías detectadas
@@ -494,6 +628,20 @@ const Produccion: React.FC = () => {
           )}
         </TabPanel>
       </Card>
+
+      {/* Modal funcional para nuevo registro */}
+      <RegistroProduccionModal
+        open={modalOpen}
+        onClose={handleCloseModal}
+        onSave={handleSaveRegistro}
+      />
+
+      {/* Modal funcional para nueva predicción */}
+      <PrediccionModal
+        open={prediccionModalOpen}
+        onClose={handleClosePrediccionModal}
+        onSave={handleSavePrediccion}
+      />
     </Box>
   );
 };

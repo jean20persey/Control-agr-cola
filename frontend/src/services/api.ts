@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { AuthTokens } from '../interfaces';
 
 class ApiService {
   private api: AxiosInstance;
@@ -205,6 +204,11 @@ class ApiService {
 
   async getAnomalias() {
     const response = await this.api.get('/produccion/registros/anomalias/');
+    return response.data;
+  }
+
+  async createPrediccion(prediccionData: any) {
+    const response = await this.api.post('/produccion/predicciones/crear/', prediccionData);
     return response.data;
   }
 
