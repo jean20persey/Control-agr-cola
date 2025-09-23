@@ -6,10 +6,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    host: '0.0.0.0', // Permite acceso desde otros dispositivos
+    host: 'localhost', // Solo acceso local
     proxy: {
       '/api': {
-        target: 'https://limicoline-probably-travis.ngrok-free.dev', // URL pública de ngrok
+        target: 'http://localhost:5000', // Backend local
         changeOrigin: true,
         secure: false,
       }

@@ -30,22 +30,11 @@ from models import db
 db.init_app(app)
 migrate = Migrate(app, db)
 jwt = JWTManager(app)
-# Configurar CORS para producción y desarrollo
+# Configurar CORS para desarrollo local
 allowed_origins = [
     'http://localhost:3000', 
-    'http://127.0.0.1:3000', 
-    'http://0.0.0.0:3000', 
-    'http://192.168.1.56:3000'
+    'http://127.0.0.1:3000'
 ]
-
-# Agregar dominios de Railway si están configurados
-frontend_url = os.environ.get('FRONTEND_URL')
-if frontend_url:
-    allowed_origins.append(frontend_url)
-
-# Permitir todos los dominios de Railway en desarrollo
-if os.environ.get('RAILWAY_ENVIRONMENT'):
-    allowed_origins.append('https://*.railway.app')
 
 CORS(app, 
      origins=allowed_origins,
@@ -125,13 +114,13 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     
-    # Usar puerto de entorno para Railway
-    port = int(os.environ.get('PORT', 5000))
-    debug = os.environ.get('FLASK_ENV') != 'production'
+    # Configuración para desarrollo local
+    port = 5000
+    debug = True
     
-    # Ejecutar la aplicación
+    # Ejecutar la aplicación en localhost
     app.run(
-        host='0.0.0.0',
+        host='127.0.0.1',
         port=port,
         debug=debug
     )

@@ -56,6 +56,19 @@
 
 ## 🚀 Instalación y Configuración
 
+### 🏠 Modo Local (Recomendado para Desarrollo)
+
+#### Inicio Rápido
+```bash
+# Windows - Doble clic o ejecutar en cmd
+start_local.bat
+
+# Linux/Mac
+python start_local.py
+```
+
+#### Configuración Manual
+
 ### 1. Clonar el repositorio
 ```bash
 git clone <url-del-repositorio>
@@ -71,33 +84,51 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 
-### 3. Instalar dependencias
+### 3. Instalar dependencias del backend
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configurar PostgreSQL
+### 4. Instalar dependencias del frontend
+```bash
+cd frontend
+npm install
+```
+
+### 5. Configurar PostgreSQL
 1. Crear la base de datos:
 ```sql
 CREATE DATABASE control_agricola;
 ```
 
-2. Verificar que las credenciales en `.env` sean correctas:
+2. Las credenciales están configuradas para desarrollo local:
 ```
-DATABASE_URL=postgresql://postgres:123456789@localhost:5432/control_agricola
-```
-
-### 5. Inicializar la base de datos
-```bash
-python -c "from app import app, db; app.app_context().push(); db.create_all()"
+postgresql://postgres:123456789@localhost:5432/control_agricola
 ```
 
-### 6. Ejecutar la aplicación
+### 6. Ejecutar el sistema
+
+#### Opción A: Script Automático
 ```bash
+python start_local.py
+```
+
+#### Opción B: Manual (2 terminales)
+```bash
+# Terminal 1 - Backend
 python app.py
+
+# Terminal 2 - Frontend
+cd frontend
+npm run dev
 ```
 
-La API estará disponible en: `http://localhost:5000`
+### 🌐 Acceso Local
+- **Frontend:** http://localhost:3000
+- **Backend API:** http://localhost:5000
+- **Documentación:** http://localhost:5000/docs/
+
+📖 **Documentación completa:** [CONFIGURACION_LOCAL.md](CONFIGURACION_LOCAL.md)
 
 ## 📚 Documentación de la API
 
@@ -243,65 +274,42 @@ base_url: http://localhost:5000
 
 ```
 Control_agricola/
-├── app.py                 # Aplicación principal
-├── models.py             # Modelos de base de datos
-├── requirements.txt      # Dependencias
-├── .env                 # Variables de entorno
-├── routes/              # Endpoints organizados
+├── app.py                    # Aplicación Flask principal
+├── models.py                 # Modelos de base de datos
+├── requirements.txt          # Dependencias Python
+├── .env                     # Variables de entorno
+├── start_local.bat          # Script de inicio Windows
+├── start_local_simple.py    # Script de inicio automático
+├── routes/                  # Endpoints organizados
 │   ├── __init__.py
-│   ├── cultivos.py      # CRUD de cultivos
-│   ├── parcelas.py      # CRUD de parcelas
-│   ├── produccion.py    # Registro de producción
-│   └── analisis.py      # Análisis y predicciones
-└── README.md           # Documentación
+│   ├── cultivos.py          # CRUD de cultivos
+│   ├── parcelas.py          # CRUD de parcelas
+│   ├── produccion.py        # Registro de producción
+│   └── analisis.py          # Análisis y predicciones
+├── frontend/                # Aplicación React + TypeScript
+│   ├── src/
+│   ├── package.json         # Dependencias Node.js
+│   ├── vite.config.ts       # Configuración Vite
+│   └── .env.local           # Variables de entorno frontend
+├── CONFIGURACION_LOCAL.md   # Guía de configuración local
+└── README.md               # Documentación principal
 ```
 
-## 📱 Acceso desde Otros Dispositivos
+## 🌐 Configuración para Producción
 
-### 🚀 Configuración Automática (Recomendado)
-```bash
-# Configurar automáticamente para acceso externo
-python start_external.py
+Para desplegar el sistema en producción, considera las siguientes opciones:
 
-# Solo obtener IP local
-python get_ip.py
-```
+### ☁️ Servicios en la Nube
+- **Heroku**: Para aplicaciones Flask + React
+- **Railway**: Despliegue automático desde Git
+- **DigitalOcean**: VPS con control completo
+- **AWS/GCP**: Servicios empresariales
 
-### ⚙️ Configuración Manual
-1. **Obtener tu IP local:**
-   - Windows: `ipconfig`
-   - Linux/Mac: `ifconfig` o `ip addr`
-
-2. **Crear `frontend/.env`:**
-   ```env
-   VITE_API_URL=http://TU_IP_AQUI:5000
-   ```
-
-3. **Acceder desde otros dispositivos:**
-   - Frontend: `http://TU_IP:3000`
-   - API: `http://TU_IP:5000`
-   - Docs: `http://TU_IP:5000/docs/`
-
-📖 **Ver guías completas:** 
-- [ACCESO_EXTERNO.md](ACCESO_EXTERNO.md) - Red local
-- [ACCESO_INTERNET.md](ACCESO_INTERNET.md) - Acceso desde internet
-
-## 🌐 Acceso desde Internet
-
-### 🚀 Opción 1: Ngrok (Rápida)
-```bash
-# Configuración automática
-python setup_internet_access.py
-```
-
-### ☁️ Opción 2: Railway (Producción)
-```bash
-# Preparar para despliegue
-python deploy_railway.py
-```
-
-### 🏠 Opción 3: Port Forwarding
-Configurar router para exponer puertos 3000 y 5000
+### 🏠 Servidor Propio
+- Configurar servidor web (Nginx/Apache)
+- Usar WSGI server (Gunicorn)
+- Configurar SSL/TLS
+- Implementar base de datos PostgreSQL
 
 ## 🔧 Configuración Avanzada
 
