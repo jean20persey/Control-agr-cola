@@ -21,6 +21,7 @@ xgboost==1.7.6
 # Utilidades
 python-decouple==3.8
 python-dateutil==2.8.2
+python-dotenv==1.0.0
 
 # Procesamiento de Datos Geoespaciales
 geopy==2.4.0
