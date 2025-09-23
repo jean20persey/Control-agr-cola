@@ -1,13 +1,12 @@
 from flask import request, jsonify
-from flask_restx import Resource, fields
-from app import api, db
-from models import Cultivo
+from flask_restx import Resource, fields, Namespace
+from models import Cultivo, db
 
 # Namespace para cultivos
-cultivos_ns = api.namespace('cultivos', description='Gestión de cultivos')
+cultivos_ns = Namespace('cultivos', description='Gestión de cultivos')
 
 # Modelos para documentación automática
-cultivo_model = api.model('Cultivo', {
+cultivo_model = cultivos_ns.model('Cultivo', {
     'nombre': fields.String(required=True, description='Nombre del cultivo'),
     'variedad': fields.String(required=True, description='Variedad del cultivo'),
     'tipo': fields.String(required=True, description='Tipo de cultivo (cereales, hortalizas, etc.)'),
@@ -16,7 +15,7 @@ cultivo_model = api.model('Cultivo', {
     'descripcion': fields.String(description='Descripción del cultivo')
 })
 
-cultivo_response = api.model('CultivoResponse', {
+cultivo_response = cultivos_ns.model('CultivoResponse', {
     'id': fields.Integer(description='ID del cultivo'),
     'nombre': fields.String(description='Nombre del cultivo'),
     'variedad': fields.String(description='Variedad del cultivo'),

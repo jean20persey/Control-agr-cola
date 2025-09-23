@@ -1,19 +1,18 @@
 from flask import request, jsonify
-from flask_restx import Resource, fields
-from app import api, db
-from models import Parcela, Cultivo
+from flask_restx import Resource, fields, Namespace
+from models import Parcela, Cultivo, db
 from datetime import datetime, date
 
 # Namespace para parcelas
-parcelas_ns = api.namespace('parcelas', description='Gestión de parcelas')
+parcelas_ns = Namespace('parcelas', description='Gestión de parcelas')
 
 # Modelos para documentación automática
-ubicacion_model = api.model('Ubicacion', {
+ubicacion_model = parcelas_ns.model('Ubicacion', {
     'lat': fields.Float(description='Latitud'),
     'lng': fields.Float(description='Longitud')
 })
 
-parcela_model = api.model('Parcela', {
+parcela_model = parcelas_ns.model('Parcela', {
     'codigo': fields.String(required=True, description='Código único de la parcela'),
     'nombre': fields.String(required=True, description='Nombre de la parcela'),
     'area_hectareas': fields.Float(required=True, description='Área en hectáreas'),
@@ -26,7 +25,7 @@ parcela_model = api.model('Parcela', {
     'fecha_cosecha_estimada': fields.String(description='Fecha estimada de cosecha (YYYY-MM-DD)')
 })
 
-parcela_response = api.model('ParcelaResponse', {
+parcela_response = parcelas_ns.model('ParcelaResponse', {
     'id': fields.Integer(description='ID de la parcela'),
     'codigo': fields.String(description='Código único de la parcela'),
     'nombre': fields.String(description='Nombre de la parcela'),

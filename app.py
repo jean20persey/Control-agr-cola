@@ -1,5 +1,4 @@
 from flask import Flask, jsonify, request
-from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -14,17 +13,45 @@ load_dotenv()
 # Inicializar Flask
 app = Flask(__name__)
 
-# Configuración de la base de datos PostgreSQL
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123456789@localhost:5432/control_agricola'
+# Configuración de base de datos para Railway
+database_url = os.environ.get('DATABASE_URL')
+if database_url:
+    # Railway proporciona DATABASE_URL
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    # Configuración local para desarrollo
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123456789@localhost:5432/control_agricola'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = 'control-agricola-secret-key-2024'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)
 
-# Inicializar extensiones
-db = SQLAlchemy(app)
+# Importar e inicializar extensiones
+from models import db
+db.init_app(app)
 migrate = Migrate(app, db)
 jwt = JWTManager(app)
-CORS(app)
+# Configurar CORS para producción y desarrollo
+allowed_origins = [
+    'http://localhost:3000', 
+    'http://127.0.0.1:3000', 
+    'http://0.0.0.0:3000', 
+    'http://192.168.1.56:3000'
+]
+
+# Agregar dominios de Railway si están configurados
+frontend_url = os.environ.get('FRONTEND_URL')
+if frontend_url:
+    allowed_origins.append(frontend_url)
+
+# Permitir todos los dominios de Railway en desarrollo
+if os.environ.get('RAILWAY_ENVIRONMENT'):
+    allowed_origins.append('https://*.railway.app')
+
+CORS(app, 
+     origins=allowed_origins,
+     allow_headers=['Content-Type', 'Authorization'],
+     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+     supports_credentials=True)
 
 # Configurar API con documentación automática
 api = Api(
@@ -34,9 +61,6 @@ api = Api(
     description='API REST para gestión y análisis de producción agrícola',
     doc='/docs/'
 )
-
-# Importar modelos
-from models import Cultivo, Parcela, RegistroProduccion, PrediccionCosecha
 
 # Importar y registrar rutas
 from routes.cultivos import cultivos_ns
@@ -94,13 +118,20 @@ def internal_error(error):
     }), 500
 
 if __name__ == '__main__':
+    # Importar modelos (después de la inicialización de la app)
+    from models import Cultivo, Parcela, RegistroProduccion, PrediccionCosecha
+    
     # Crear tablas si no existen
     with app.app_context():
         db.create_all()
     
+    # Usar puerto de entorno para Railway
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('FLASK_ENV') != 'production'
+    
     # Ejecutar la aplicación
     app.run(
         host='0.0.0.0',
-        port=5000,
-        debug=True
+        port=port,
+        debug=debug
     )

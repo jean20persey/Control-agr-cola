@@ -1,4 +1,7 @@
-from app import db
+from flask_sqlalchemy import SQLAlchemy
+
+# Crear instancia de db que será inicializada por la app
+db = SQLAlchemy()
 from datetime import datetime
 from sqlalchemy import Index
 from sqlalchemy.dialects.postgresql import UUID, JSONB

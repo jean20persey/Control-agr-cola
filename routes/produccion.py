@@ -1,21 +1,21 @@
 from flask import request, jsonify
-from flask_restx import Resource, fields
-from app import api, db
+from flask_restx import Resource, fields, Namespace
+from models import db
 from models import RegistroProduccion, Parcela, Cultivo
 from datetime import datetime, date
 from sqlalchemy import and_, or_, func
 
 # Namespace para producción
-produccion_ns = api.namespace('produccion', description='Registro de producción agrícola')
+produccion_ns = Namespace('produccion', description='Registro de producción agrícola')
 
 # Modelos para documentación automática
-condiciones_ambientales_model = api.model('CondicionesAmbientales', {
+condiciones_ambientales_model = produccion_ns.model('CondicionesAmbientales', {
     'temperatura_promedio': fields.Float(description='Temperatura promedio en °C'),
     'precipitacion_mm': fields.Float(description='Precipitación en mm'),
     'humedad_relativa': fields.Float(description='Humedad relativa en %')
 })
 
-registro_produccion_model = api.model('RegistroProduccion', {
+registro_produccion_model = produccion_ns.model('RegistroProduccion', {
     'parcela_id': fields.Integer(required=True, description='ID de la parcela'),
     'cultivo_id': fields.Integer(required=True, description='ID del cultivo'),
     'fecha_registro': fields.String(required=True, description='Fecha del registro (YYYY-MM-DD)'),
@@ -28,7 +28,7 @@ registro_produccion_model = api.model('RegistroProduccion', {
     'notas_anomalia': fields.String(description='Notas sobre anomalías detectadas')
 })
 
-registro_response = api.model('RegistroProduccionResponse', {
+registro_response = produccion_ns.model('RegistroProduccionResponse', {
     'id': fields.Integer(description='ID del registro'),
     'parcela_id': fields.Integer(description='ID de la parcela'),
     'cultivo_id': fields.Integer(description='ID del cultivo'),

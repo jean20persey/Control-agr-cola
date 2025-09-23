@@ -1,6 +1,6 @@
 from flask import request, jsonify
-from flask_restx import Resource, fields
-from app import api, db
+from flask_restx import Resource, fields, Namespace
+from models import db
 from models import RegistroProduccion, Parcela, Cultivo, PrediccionCosecha
 import pandas as pd
 import numpy as np
@@ -13,16 +13,16 @@ from datetime import datetime, date, timedelta
 import json
 
 # Namespace para análisis
-analisis_ns = api.namespace('analisis', description='Análisis estadístico y predicciones')
+analisis_ns = Namespace('analisis', description='Análisis estadístico y predicciones')
 
 # Modelos para documentación automática
-comparacion_variedades_model = api.model('ComparacionVariedades', {
+comparacion_variedades_model = analisis_ns.model('ComparacionVariedades', {
     'cultivo_id_1': fields.Integer(required=True, description='ID del primer cultivo'),
     'cultivo_id_2': fields.Integer(required=True, description='ID del segundo cultivo'),
     'temporada': fields.String(description='Temporada específica para comparar')
 })
 
-prediccion_model = api.model('PrediccionCosecha', {
+prediccion_model = analisis_ns.model('PrediccionCosecha', {
     'parcela_id': fields.Integer(required=True, description='ID de la parcela'),
     'cultivo_id': fields.Integer(required=True, description='ID del cultivo'),
     'temporada_objetivo': fields.String(required=True, description='Temporada objetivo (ej: 2024-2)'),

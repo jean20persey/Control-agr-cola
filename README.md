@@ -256,6 +256,53 @@ Control_agricola/
 └── README.md           # Documentación
 ```
 
+## 📱 Acceso desde Otros Dispositivos
+
+### 🚀 Configuración Automática (Recomendado)
+```bash
+# Configurar automáticamente para acceso externo
+python start_external.py
+
+# Solo obtener IP local
+python get_ip.py
+```
+
+### ⚙️ Configuración Manual
+1. **Obtener tu IP local:**
+   - Windows: `ipconfig`
+   - Linux/Mac: `ifconfig` o `ip addr`
+
+2. **Crear `frontend/.env`:**
+   ```env
+   VITE_API_URL=http://TU_IP_AQUI:5000
+   ```
+
+3. **Acceder desde otros dispositivos:**
+   - Frontend: `http://TU_IP:3000`
+   - API: `http://TU_IP:5000`
+   - Docs: `http://TU_IP:5000/docs/`
+
+📖 **Ver guías completas:** 
+- [ACCESO_EXTERNO.md](ACCESO_EXTERNO.md) - Red local
+- [ACCESO_INTERNET.md](ACCESO_INTERNET.md) - Acceso desde internet
+
+## 🌐 Acceso desde Internet
+
+### 🚀 Opción 1: Ngrok (Rápida)
+```bash
+# Configuración automática
+python setup_internet_access.py
+```
+
+### ☁️ Opción 2: Railway (Producción)
+```bash
+# Preparar para despliegue
+python deploy_railway.py
+```
+
+### 🏠 Opción 3: Port Forwarding
+Configurar router para exponer puertos 3000 y 5000
+
 ## 🔧 Configuración Avanzada
 
 ### Variables de Entorno
